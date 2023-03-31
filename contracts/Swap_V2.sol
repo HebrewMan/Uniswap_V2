@@ -10,6 +10,7 @@ interface IDonation{
     function subQuateBySwap(address addr,uint amount)external;
 }
 
+
 contract Swap is Ownable{
 
     uint public max = 5000 ether;
@@ -47,6 +48,7 @@ contract Swap is Ownable{
 
 
      /**
+     * @dev path[wyoho usdt]
      * @dev need enough wyoho token
      * user's yoho\usdt need approve to this contract for transferFrom 
      * contract wyoho need approve to router
@@ -56,11 +58,10 @@ contract Swap is Ownable{
      */
 
     function addLiquidity(address[] calldata _path,uint256 _amount0, uint256 _amount1) external checkLength(_path){
-
-        IERC20(_path[0]).transferFrom(msg.sender, address(this), _amount0);
+        IERC20(yohoToken).transferFrom(msg.sender, address(this), _amount0);
         IERC20(_path[1]).transferFrom(msg.sender, address(this), _amount1);
-        IERC20(_path[0]).approve(address(Router), _amount0);
-        IERC20(_path[1]).approve(address(Router), _amount1);
+        IERC20(_path[0]).approve(address(Router), _amount0);//wyoho
+        IERC20(_path[1]).approve(address(Router), _amount1);//usdt
 
         Router.addLiquidity(_path[0], _path[1], _amount0, _amount1, 0, 0, msg.sender, block.timestamp);
     }
@@ -126,14 +127,15 @@ contract Swap is Ownable{
         require(_amount <= userMax,"Swap: Exceeded your HO quota."); //max check
         require(_amount <= max,"Swap: The maximum single amount is 100,000,000.");
 
-        uint wyohoAmount = IERC20(_path[0]).balanceOf(address(this));
+        uint wyohoAmount = IERC20(wyohoToken).balanceOf(address(this));
         require(wyohoAmount >= _amount,"Swap: Insufficient funds.");
 
-        IERC20(_path[0]).transferFrom(msg.sender, address(this), _amount);
-        IERC20(_path[0]).approve(address(Router),_amount);
+        IERC20(yohoToken).transferFrom(msg.sender, address(this), _amount);
+        IERC20(wyohoToken).approve(address(Router),_amount);
 
         Router.swapExactTokensForTokens(_amount, 0, _path, msg.sender, block.timestamp);
         Donation.subQuateBySwap(msg.sender,_amount);//sub quota
+
     }
 
 

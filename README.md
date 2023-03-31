@@ -15,7 +15,6 @@ npx hardhat run scripts/deploy.ts
 # 项目需求
 
 由于之前的 swap 合约已经部署无法替换，项目方为了在自己的代币 YOHO 上做一些限制操作。达到某种条件才可以进行 swap 兑换其他 token 故此提出解决方案写一个新的 swap 合约
-
 并且创建一个新的 token 与 YOHO 1:1兑换 ，添加新 token 的流动性
  
 1. 在原有的 swap 上进行交易，涉及到 YOHO 的兑换时。创建 WYOHO 与 YOHO 1:1进行兑换
